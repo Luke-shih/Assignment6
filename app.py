@@ -7,9 +7,8 @@ import bcrypt
 app=Flask(__name__, static_folder="public", static_url_path="/")
 app.secret_key = "assignmentweek6"
 
-
 @app.route("/")
-def homepage(): # 一進入"/"時先切換到 homepage 首頁
+def homepage():
     return render_template("homepage.html") 
 
 @app.route("/signup", methods = ['GET', 'POST'])
@@ -25,7 +24,7 @@ def signup():
 
     sql1 = "select * from user"
     cursor.execute(sql1)
-    all_users = cursor.fetchall() # 查詢到所有的數據存儲到all_users中
+    all_users = cursor.fetchall()
     i = 0
     
     while i < len(all_users):
@@ -92,21 +91,19 @@ def member():
     else:
         return redirect(url_for("error"))
    
-@app.route("/error") # 當帳號密碼有一個不等於 test 時執行
+@app.route("/error") 
 def error():
-
+    
     message = request.args.get("message", None)
     return render_template("error.html", data = message)
 
 @app.route("/logout")
 def logout():
-    session.pop("name", None)    # 將 name 清空
-    session.pop("username", None)    # 將 username 清空
-    session.pop("password", None)   # 將 password 清空
+    session.pop("name", None)    
+    session.pop("username", None)    
+    session.pop("password", None)  
 
-    return redirect(url_for("homepage"))    # 回傳到首頁
+    return redirect(url_for("homepage"))    
 
-# 使用__name__ == '__main__'是Python的慣用法，確保直接執行此腳本時才
-# 啟動服務器，若其他程序調用該腳本可能父級程序會啟動不同的服務器
 if __name__ == '__main__':
     app.run(port=3000)
