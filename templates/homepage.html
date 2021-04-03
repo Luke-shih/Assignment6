@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomePage</title>
+    <style type="text/css">
+        html,
+        body,
+        div,
+        span,
+        applet,
+        object,
+        iframe,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        blockquote,
+        pre,
+        a,
+        abbr,
+        acronym,
+        address,
+        big,
+        cite,
+        code,
+        del,
+        dfn,
+        em,
+        img,
+        ins,
+        kbd,
+        q,
+        s,
+        samp,
+        small,
+        strike,
+        strong,
+        sub,
+        sup,
+        tt,
+        var,
+        b,
+        u,
+        i,
+        center,
+        dl,
+        dt,
+        dd,
+        ol,
+        ul,
+        li,
+        fieldset,   
+        form,
+        label,
+        legend,
+        table,
+        caption,
+        tbody,
+        tfoot,
+        thead,
+        tr,
+        th,
+        td,
+        article,
+        aside,
+        canvas,
+        details,
+        embed,
+        figure,
+        figcaption,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        output,
+        ruby,
+        section,
+        summary,
+        time,
+        mark,
+        audio,
+        video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        section {
+        display: block;
+        }
+        body {
+            line-height: 1;
+        }
+        ol,
+        ul {
+            list-style: none;
+        }
+        blockquote,
+        q {
+            quotes: none;
+        }
+        blockquote:before,
+        blockquote:after,
+        q:before,
+        q:after {
+            content: '';
+            content: none;
+        }
+        .header{
+            background-color: #303030;
+        }
+        .header p{
+            font-size: 32px;
+            color: white;
+            text-align: center;
+            line-height: 100px;
+        }
+        .content{
+            position: relative; 
+        }
+        .content p{
+            font-size: 24px;
+            text-align: center;
+            padding-top: 60px;
+            padding-bottom: 20px;
+        }
+        .register
+        {
+            width: 100%;
+            margin:0px auto;
+            padding:0px;
+            text-align:center;
+            margin-bottom: 20px;
+        }
+        .login{
+            width: 100%;
+            margin:0px auto;
+            padding:0px;
+            text-align:center;
+            margin-bottom: 20px;
+        }
+        .form{
+            padding-left: 30px;
+        }
+        .line{
+            height: 1px;
+            border-top: solid #ACC0D8 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <p>歡迎光臨，請註冊登入系統</p>
+    </div>
+    <div class="content">
+        <p>註冊帳號</p>
+        <div class="register">
+            <form action="/signup" method="POST">
+                姓名 <input id="name" input name="name" type="text" placeholder="請輸入姓名"><br/>
+                <br/>
+                帳號 <input id="username" input name="username" type="text" placeholder="請輸入帳號"><br/>
+                <br/>
+                密碼 <input id="passowrd" input name="password" type="text" placeholder="請輸入密碼"><br/>
+                <button style="margin-top: 20px">註冊</button>
+            </form>
+        </div>
+
+        <div class="line"></div>
+
+        <p>登入系統</p>
+        <div class="login">
+            <form action="/signin" method="POST">
+                帳號 <input name="username" type="text" placeholder="請輸入帳號"><br/>
+                <br/>
+                密碼 <input name="password" type="text" placeholder="請輸入密碼"><br/>
+                <button style="margin-top: 20px">登入</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
