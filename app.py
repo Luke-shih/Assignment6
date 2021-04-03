@@ -7,6 +7,7 @@ import bcrypt
 app=Flask(__name__, static_folder="public", static_url_path="/")
 app.secret_key = "assignmentweek6"
 
+
 @app.route("/")
 def homepage(): # 一進入"/"時先切換到 homepage 首頁
     return render_template("homepage.html") 
@@ -14,11 +15,9 @@ def homepage(): # 一進入"/"時先切換到 homepage 首頁
 @app.route("/signup", methods = ['GET', 'POST'])
 def signup():
     has_regiter = 0 # 用來記錄當前帳號是否已存在，0：不存在 1：已存在
-    global name 
+    
     name = request.form.get('name')
-    global username
     username = request.form.get('username')
-    global password
     password = request.form.get('password')
 
     db =  pymysql.connect(host="127.0.0.1", user="root", password="1234", database="website")
@@ -40,63 +39,53 @@ def signup():
         cursor = db.cursor()
         cursor.execute(sql2, val)
         db.commit()
-        cursor.close()
-        db.close()
-
-        global nickname # 設置全域變數，讓 member 頁面有名字可以抓
-        nickname = name
 
         session['name'] = name
         session['username'] = username
         session['password'] = password
 
+        global nickname
+        nickname = name
+
+        cursor.close()
+        db.close()
         return redirect(url_for("member"))
     else:
         cursor.close()
         db.close()
-
-        global message # 設置全域變數，讓 error 頁面使用 Query String
-        message = "帳號已經被註冊" 
-        
         return redirect(url_for("error"))
 
 @app.route('/signin', methods=["POST", "GET"])
 def signin():
-    
-    if request.method == "POST" and "username" in request.form and "password" in request.form:
-        username = request.form.get('username')
-        password = request.form.get('password')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-        db =  pymysql.connect(host="127.0.0.1", user="root", password="1234", database="website")
-        cursor = db.cursor()
+    db =  pymysql.connect(host="127.0.0.1", user="root", password="1234", database="website")
+    cursor = db.cursor()
 
-        sql = "SELECT * FROM `website`.`user` WHERE `username` =  %s and password = %s;"      
+    sql = "SELECT * FROM `website`.`user` WHERE `username` =  %s and password = %s;"      
+    val = (username, password)
+    cursor.execute(sql, val)
+    users = cursor.fetchall()
+    if len(users) > 0:
+        sql = "SELECT * FROM `website`.`user` WHERE `username` = %s and password = %s;"
         val = (username, password)
         cursor.execute(sql, val)
-        user = cursor.fetchall()
-        if len(user) == 0: # 如果查詢資料表中符合筆數 = 0，跳轉到
 
-            global message
-            message = "帳號或密碼輸入錯誤"
+        session['username'] = username
+        session['password'] = password
 
-            return redirect(url_for("error"))
-        else:
-            sql = "SELECT * FROM `website`.`user` WHERE `username` = %s and password = %s;"
-            val = (username, password)
-            cursor.execute(sql, val)
-
-            session['username'] = username
-            session['password'] = password
-
-            result = cursor.fetchone()
-            global nickname
-            nickname = result[1]
-
-            return redirect(url_for('member'))
-            db.close()
+        result = cursor.fetchone()
+        global nickname
+        nickname = result[1]
+        db.close()
+        return redirect(url_for('member'))
+    else:
+        return redirect(url_for("error"))
 
 @app.route("/member")
 def member():
+
     if "username" in session and "password" in session:
         result = request.args.get("name", nickname)
         return render_template("member.html", data = result)
@@ -105,17 +94,16 @@ def member():
    
 @app.route("/error") # 當帳號密碼有一個不等於 test 時執行
 def error():
-    
-    result = request.args.get("message", message)
-    return render_template("error.html", data = result)
+
+    message = request.args.get("message", None)
+    return render_template("error.html", data = message)
 
 @app.route("/logout")
 def logout():
     session.pop("name", None)    # 將 name 清空
     session.pop("username", None)    # 將 username 清空
     session.pop("password", None)   # 將 password 清空
-    global message
-    message = "帳號或密碼錯誤"
+
     return redirect(url_for("homepage"))    # 回傳到首頁
 
 # 使用__name__ == '__main__'是Python的慣用法，確保直接執行此腳本時才
