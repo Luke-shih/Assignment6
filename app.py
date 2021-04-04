@@ -26,9 +26,9 @@ def signup():
     while name == "" or username == "" or password =="": # 如果沒輸入資料就案註冊，跳轉 error
         return redirect(url_for('error', message = request.args.get("message", "請輸入姓名及帳號密碼")))
 
-    sql = "select username from user where username = %s and password = %s;"
-    val = (username, password)
-    cursor.execute(sql, val)
+    sql = "SELECT username FROM `website`.`user` WHERE username = %s ;"
+    
+    cursor.execute(sql, username)
     has_regiter = cursor.fetchall()
 
     if len(has_regiter) == 0:
