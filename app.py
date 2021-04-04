@@ -8,7 +8,7 @@ app=Flask(__name__, static_folder="public", static_url_path="/")
 app.secret_key = "assignmentweek6"
 
 @app.route("/")
-def homepage():
+def homepage(): # 一進入"/"時先切換到 homepage 首頁
     return render_template("homepage.html") 
 
 @app.route("/signup", methods = ['GET', 'POST'])
@@ -24,7 +24,7 @@ def signup():
 
     sql1 = "select * from user"
     cursor.execute(sql1)
-    all_users = cursor.fetchall()
+    all_users = cursor.fetchall() # 查詢到所有的數據存儲到all_users中
     i = 0
     
     while i < len(all_users):
@@ -52,7 +52,8 @@ def signup():
     else:
         cursor.close()
         db.close()
-        return redirect(url_for("error"))
+        message = request.args.get("message", "此帳號已被註冊")
+        return render_template("error.html", data = message)
 
 @app.route('/signin', methods=["POST", "GET"])
 def signin():
@@ -80,8 +81,8 @@ def signin():
         db.close()
         return redirect(url_for('member'))
     else:
-        return redirect(url_for("error"))
-
+        message = request.args.get("message", "帳號或密碼輸入錯誤")
+        return render_template("error.html", data = message)
 @app.route("/member")
 def member():
 
@@ -89,21 +90,20 @@ def member():
         result = request.args.get("name", nickname)
         return render_template("member.html", data = result)
     else:
-        return redirect(url_for("error"))
+        message = request.args.get("message", "帳號或密碼輸入錯誤")
+        return render_template("error.html", data = message)
    
-@app.route("/error") 
+@app.route("/error/") 
 def error():
+    return render_template("error.html")
     
-    message = request.args.get("message", None)
-    return render_template("error.html", data = message)
-
 @app.route("/logout")
 def logout():
-    session.pop("name", None)    
-    session.pop("username", None)    
-    session.pop("password", None)  
+    session.pop("name", None)    # 將 name 清空
+    session.pop("username", None)    # 將 username 清空
+    session.pop("password", None)   # 將 password 清空
 
-    return redirect(url_for("homepage"))    
+    return redirect(url_for("homepage"))    # 回傳到首頁
 
 if __name__ == '__main__':
     app.run(port=3000)
