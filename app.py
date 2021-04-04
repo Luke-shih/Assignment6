@@ -15,49 +15,35 @@ def homepage(): # 一進入"/"時先切換到 homepage 首頁
 def signup():
     has_regiter = 0 # 用來記錄當前帳號是否已存在，0：不存在 1：已存在
     
-    name = request.form.get('name')
-    username = request.form.get('username')
-    password = request.form.get('password')
+    name = request.form.get('name')         # 取得輸入 form 中的 name 資料
+    username = request.form.get('username') # 取得輸入 form 中的 username 資料
+    password = request.form.get('password') # 取得輸入 form 中的 password 資料
 
-    db =  pymysql.connect(host="127.0.0.1", user="root", password="1234", database="website")
+    db =  pymysql.connect(host="127.0.0.1", user="root", password="1234", database="website") # 連接資料庫
     cursor = db.cursor()
 
-    sql1 = "select * from user"
-    cursor.execute(sql1)
-    all_users = cursor.fetchall() # 查詢到所有的數據存儲到all_users中
-    i = 0
 
-    if name == "" or username == "" or password =="":
-        message = request.args.get("message", "請輸入正確資料")
-        return render_template("error.html", data = message)
+    while name == "" or username == "" or password =="": # 如果沒輸入資料就案註冊，跳轉 error
+        return redirect(url_for('error', message = request.args.get("message", "請輸入姓名及帳號密碼")))
+
+    sql = "select username from user where username = %s and password = %s;"
+    val = (username, password)
+    cursor.execute(sql, val)
+    has_regiter = cursor.fetchall()
+
+    if len(has_regiter) == 0:
+        session['name'] = name
+        session['username'] = username
+        session['password'] = password
+
+        global nickname # 設一個 global nickname 讓會員頁面抓
+        nickname = name
+
+        cursor.close()
+        db.close()
+        return redirect(url_for("member"))
     else:
-        while i < len(all_users):
-            if username in all_users[i]:
-                has_regiter = 1 # 表示該帳號已經存在
-            i+= 1
-        if has_regiter == 0: # 表示資料表中找不到相同的
-            sql2 = "INSERT INTO `website`.`user` ( `name`, `username`, `password`) VALUES (%s, %s, %s);"
-
-            val = (name, username, password)
-            cursor = db.cursor()
-            cursor.execute(sql2, val)
-            db.commit()
-
-            session['name'] = name
-            session['username'] = username
-            session['password'] = password
-
-            global nickname
-            nickname = name
-
-            cursor.close()
-            db.close()
-            return redirect(url_for("member"))
-        else:
-            cursor.close()
-            db.close()
-            message = request.args.get("message", "此帳號已被註冊")
-            return render_template("error.html", data = message)
+        return redirect(url_for('error', message = request.args.get("message", "帳號已經被註冊過")))
 
 @app.route('/signin', methods=["POST", "GET"])
 def signin():
@@ -71,25 +57,23 @@ def signin():
     val = (username, password)
     cursor.execute(sql, val)
     users = cursor.fetchall()
-    if username == "" or password =="":
-        message = request.args.get("message", "請輸入正確資料")
-        return render_template("error.html", data = message)
+    if username == "" or password =="": # 如果沒輸入資料就案註冊，跳轉 error
+        return redirect(url_for('error', message = request.args.get("message", "帳號或密碼錯誤")))
     elif len(users) > 0:
         sql = "SELECT * FROM `website`.`user` WHERE `username` = %s and password = %s;"
         val = (username, password)
         cursor.execute(sql, val)
 
-        session['username'] = username
-        session['password'] = password
+        session['username'] = username # 將 username 加入 session 中
+        session['password'] = password # 將 password 加入 session 中 
 
         result = cursor.fetchone()
         global nickname
-        nickname = result[1]
+        nickname = result[1] # [1]代表 name 位置
         db.close()
         return redirect(url_for('member'))
     else:
-        message = request.args.get("message", "帳號或密碼輸入錯誤")
-        return render_template("error.html", data = message)
+        return redirect(url_for('error', message = request.args.get("message", "帳號或密碼錯誤")))
 @app.route("/member")
 def member():
 
@@ -97,12 +81,12 @@ def member():
         result = request.args.get("name", nickname)
         return render_template("member.html", data = result)
     else:
-        message = request.args.get("message", "帳號或密碼輸入錯誤")
-        return render_template("error.html", data = message)
+        return redirect(url_for('error', message = request.args.get("message", "帳號或密碼錯誤")))
    
 @app.route("/error/") 
 def error():
-    return render_template("error.html")
+    message = request.args.get("message", None)
+    return render_template("error.html",data = message)
 
 @app.route("/logout")
 def logout():
