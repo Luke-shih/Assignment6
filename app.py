@@ -26,34 +26,38 @@ def signup():
     cursor.execute(sql1)
     all_users = cursor.fetchall() # 查詢到所有的數據存儲到all_users中
     i = 0
-    
-    while i < len(all_users):
-        if username in all_users[i]:
-            has_regiter = 1 # 表示該帳號已經存在
-        i+= 1
-    if has_regiter == 0: # 表示資料表中找不到相同的
-        sql2 = "INSERT INTO `website`.`user` ( `name`, `username`, `password`) VALUES (%s, %s, %s);"
 
-        val = (name, username, password)
-        cursor = db.cursor()
-        cursor.execute(sql2, val)
-        db.commit()
-
-        session['name'] = name
-        session['username'] = username
-        session['password'] = password
-
-        global nickname
-        nickname = name
-
-        cursor.close()
-        db.close()
-        return redirect(url_for("member"))
-    else:
-        cursor.close()
-        db.close()
-        message = request.args.get("message", "此帳號已被註冊")
+    if name == "" or username == "" or password =="":
+        message = request.args.get("message", "請輸入正確資料")
         return render_template("error.html", data = message)
+    else:
+        while i < len(all_users):
+            if username in all_users[i]:
+                has_regiter = 1 # 表示該帳號已經存在
+            i+= 1
+        if has_regiter == 0: # 表示資料表中找不到相同的
+            sql2 = "INSERT INTO `website`.`user` ( `name`, `username`, `password`) VALUES (%s, %s, %s);"
+
+            val = (name, username, password)
+            cursor = db.cursor()
+            cursor.execute(sql2, val)
+            db.commit()
+
+            session['name'] = name
+            session['username'] = username
+            session['password'] = password
+
+            global nickname
+            nickname = name
+
+            cursor.close()
+            db.close()
+            return redirect(url_for("member"))
+        else:
+            cursor.close()
+            db.close()
+            message = request.args.get("message", "此帳號已被註冊")
+            return render_template("error.html", data = message)
 
 @app.route('/signin', methods=["POST", "GET"])
 def signin():
@@ -67,7 +71,10 @@ def signin():
     val = (username, password)
     cursor.execute(sql, val)
     users = cursor.fetchall()
-    if len(users) > 0:
+    if username == "" or password =="":
+        message = request.args.get("message", "請輸入正確資料")
+        return render_template("error.html", data = message)
+    elif len(users) > 0:
         sql = "SELECT * FROM `website`.`user` WHERE `username` = %s and password = %s;"
         val = (username, password)
         cursor.execute(sql, val)
@@ -96,7 +103,7 @@ def member():
 @app.route("/error/") 
 def error():
     return render_template("error.html")
-    
+
 @app.route("/logout")
 def logout():
     session.pop("name", None)    # 將 name 清空
