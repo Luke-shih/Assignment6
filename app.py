@@ -36,6 +36,11 @@ def signup():
         session['username'] = username
         session['password'] = password
 
+        sql = "INSERT INTO user (name,username,password) VALUES (%s, %s, %s);"
+        val = (name, username, password)
+        cursor.execute(sql, val)
+        db.commit()
+
         global nickname # 設一個 global nickname 讓會員頁面抓
         nickname = name
 
